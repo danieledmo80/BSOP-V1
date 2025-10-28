@@ -5,97 +5,99 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BSOP MILLIONS – Planta Interativa</title>
   <style>
-    :root { --gold: #FFD700; }
-    html, body { margin:0; background:#000; color:#fff; font-family: Arial, Helvetica, sans-serif; }
-    header { text-align:center; padding:10px 0; background:linear-gradient(90deg,#0f0f0f,#252525); border-bottom:2px solid var(--gold); }
-    header img.logo { height:50px; display:block; margin:0 auto 6px; }
-    header h1 { margin:0; font-size:clamp(20px,4vw,34px); color:var(--gold); }
-    main { display:flex; justify-content:center; padding:10px; }
-
-    /* Contêiner da planta */
+    html, body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      text-align: center;
+      padding: 10px 0;
+      background: linear-gradient(90deg, #0f0f0f, #252525);
+      border-bottom: 2px solid #FFD700;
+    }
+    header img.logo {
+      height: 50px;
+      display: block;
+      margin: 0 auto 6px;
+    }
+    header h1 {
+      margin: 0;
+      color: #FFD700;
+    }
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
     #planta {
       position: relative;
       width: 1171px;
       height: 788px;
       max-width: 95vw;
-      aspect-ratio: 1171 / 788;
     }
-
-    /* Todas as camadas ocupam a mesma área */
-    #planta > img {
+    #planta img {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       object-fit: contain;
-      transition: opacity .25s ease;
     }
-
-    /* Ordem das camadas */
-    #planta > img.bg   { z-index: 1; }       /* base abaixo */
-    #planta > img.zona { z-index: 2; }       /* overlays acima */
-
-    /* Estado das zonas */
-    .zona { opacity: 0; pointer-events: none; }   /* invisível por padrão */
-    .zona.ativa { opacity: 1; }                   /* visível quando ativa */
-
-    footer { text-align:center; color:#bbb; font-size:12px; padding:10px 0 16px; }
+    #planta img.bg {
+      z-index: 1;
+    }
+    #planta img.zona {
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #planta img.zona.ativa {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Logo" class="logo">
+    <img src="logo.png" class="logo" alt="Logo" />
     <h1>BSOP MILLIONS</h1>
   </header>
 
   <main>
     <div id="planta">
-      <!-- BG SEMPRE por baixo -->
-      <img src="bg.png" class="bg" alt="Planta Base">
-
-      <!-- ZONAS SEMPRE por cima -->
-      <img id="zona1" class="zona ativa" src="zona1.png" alt="Zona 1">
-      <img id="zona2"  class="zona" src="zona2.png"  alt="Zona 2">
-      <img id="zona3"  class="zona" src="zona3.png"  alt="Zona 3">
-      <img id="zona4"  class="zona" src="zona4.png"  alt="Zona 4">
-      <img id="zona5"  class="zona" src="zona5.png"  alt="Zona 5">
-      <img id="zona6"  class="zona" src="zona6.png"  alt="Zona 6">
-      <img id="zona7"  class="zona" src="zona7.png"  alt="Zona 7">
-      <img id="zona8"  class="zona" src="zona8.png"  alt="Zona 8">
-      <img id="zona9"  class="zona" src="zona9.png"  alt="Zona 9">
-      <img id="zona10" class="zona" src="zona10.png" alt="Zona 10">
-      <img id="zona11" class="zona" src="zona11.png" alt="Zona 11">
-      <img id="zona12" class="zona" src="zona12.png" alt="Zona 12">
-      <img id="zona13" class="zona" src="zona13.png" alt="Zona 13">
-      <img id="zona14" class="zona" src="zona14.png" alt="Zona 14">
-      <img id="zona15" class="zona" src="zona15.png" alt="Zona 15">
+      <img src="bg.png" class="bg" alt="Planta base" />
+      <img id="zona1" class="zona" src="zona1.png" alt="Zona 1" />
+      <img id="zona2" class="zona" src="zona2.png" alt="Zona 2" />
+      <img id="zona3" class="zona" src="zona3.png" alt="Zona 3" />
+      <img id="zona4" class="zona" src="zona4.png" alt="Zona 4" />
+      <img id="zona5" class="zona" src="zona5.png" alt="Zona 5" />
+      <img id="zona6" class="zona" src="zona6.png" alt="Zona 6" />
+      <img id="zona7" class="zona" src="zona7.png" alt="Zona 7" />
+      <img id="zona8" class="zona" src="zona8.png" alt="Zona 8" />
+      <img id="zona9" class="zona" src="zona9.png" alt="Zona 9" />
+      <img id="zona10" class="zona" src="zona10.png" alt="Zona 10" />
+      <img id="zona11" class="zona" src="zona11.png" alt="Zona 11" />
+      <img id="zona12" class="zona" src="zona12.png" alt="Zona 12" />
+      <img id="zona13" class="zona" src="zona13.png" alt="Zona 13" />
+      <img id="zona14" class="zona" src="zona14.png" alt="Zona 14" />
+      <img id="zona15" class="zona" src="zona15.png" alt="Zona 15" />
     </div>
   </main>
 
-  <footer>Apresentação – BSOP MILLIONS</footer>
-
   <script>
-    // WebSocket compartilhando a mesma origem (Render/Glitch-friendly)
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
     const ws = new WebSocket(`${proto}://${location.host}`);
-
     ws.onmessage = (ev) => {
-      const data = JSON.parse(ev.data || '{}');
-
-      // aplica estado inicial ao conectar
-      if (data.action === 'estado_inicial' && data.zonas) {
-        Object.entries(data.zonas).forEach(([id, on]) => {
-          const el = document.getElementById(id);
-          if (el) el.classList.toggle('ativa', !!on);
-        });
-        return;
+      const data = JSON.parse(ev.data);
+      if (data.action === 'estado_inicial') {
+        for (const [zona, ativa] of Object.entries(data.zonas))
+          document.getElementById(zona)?.classList.toggle('ativa', ativa);
+      } else {
+        const el = document.getElementById(data.zona);
+        if (el) el.classList.toggle('ativa', data.action === 'ativar');
       }
-
-      const el = document.getElementById(data.zona);
-      if (!el) return;
-
-      if (data.action === 'ativar')   el.classList.add('ativa');
-      if (data.action === 'desativar') el.classList.remove('ativa');
     };
   </script>
 </body>
