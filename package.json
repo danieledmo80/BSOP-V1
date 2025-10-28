@@ -1,0 +1,13 @@
+{
+  "name": "planta-bsop-millions",
+  "version": "1.0.0",
+  "description": "App interativo BSOP MILLIONS com controle via Stream Deck",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.13.0"
+  }
+}
