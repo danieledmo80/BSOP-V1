@@ -2,64 +2,73 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BSOP MILLIONS - Audio Equipe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BSOP MILLIONS – Planta Interativa</title>
   <style>
-    body {
-      background-color: black;
-      color: gold;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      overflow: hidden;
-    }
-    header {
-      margin-top: 15px;
-    }
-    img.logo {
-      height: 60px;
-      display: block;
-      margin: 0 auto 10px;
-    }
-    .container {
-      position: relative;
-      width: 1171px;
-      height: 788px;
-      margin: 20px auto;
-    }
-    .container img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .zona { opacity: 0; transition: opacity 0.4s; }
-    .zona.ativa { opacity: 1; }
+    :root { --gold: #FFD700; }
+    html, body { margin:0; background:#000; color:#fff; font-family: Arial, Helvetica, sans-serif; }
+    header { text-align:center; padding:10px 0; background:linear-gradient(90deg,#0f0f0f,#252525); border-bottom:2px solid var(--gold); }
+    header img.logo { height:50px; display:block; margin:0 auto 6px; }
+    header h1 { margin:0; font-size:clamp(20px,4vw,34px); color:var(--gold); }
+    main { display:flex; justify-content:center; padding:10px; }
+    #planta { position:relative; width:1171px; height:788px; max-width:95vw; aspect-ratio:1171/788; }
+    #planta > img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transition:opacity .25s ease; }
+    .zona { opacity:0; }
+    .zona.ativa { opacity:1; }
+    footer { text-align:center; color:#bbb; font-size:12px; padding:10px 0 16px; }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Logo Audio Equipe" class="logo" />
+    <img src="logo.png" alt="Logo" class="logo">
     <h1>BSOP MILLIONS</h1>
   </header>
 
-  <div class="container">
-    <img src="bg.png" alt="Planta base" />
-    <img src="zona1.png" class="zona" id="zona1" />
-    <img src="zona2.png" class="zona" id="zona2" />
-    <!-- Repita até zona15 -->
-  </div>
+  <main>
+    <div id="planta">
+      <img src="bg.png" alt="Planta Base">
+      <img id="zona1"  class="zona" src="zona1.png"  alt="Zona 1">
+      <img id="zona2"  class="zona" src="zona2.png"  alt="Zona 2">
+      <img id="zona3"  class="zona" src="zona3.png"  alt="Zona 3">
+      <img id="zona4"  class="zona" src="zona4.png"  alt="Zona 4">
+      <img id="zona5"  class="zona" src="zona5.png"  alt="Zona 5">
+      <img id="zona6"  class="zona" src="zona6.png"  alt="Zona 6">
+      <img id="zona7"  class="zona" src="zona7.png"  alt="Zona 7">
+      <img id="zona8"  class="zona" src="zona8.png"  alt="Zona 8">
+      <img id="zona9"  class="zona" src="zona9.png"  alt="Zona 9">
+      <img id="zona10" class="zona" src="zona10.png" alt="Zona 10">
+      <img id="zona11" class="zona" src="zona11.png" alt="Zona 11">
+      <img id="zona12" class="zona" src="zona12.png" alt="Zona 12">
+      <img id="zona13" class="zona" src="zona13.png" alt="Zona 13">
+      <img id="zona14" class="zona" src="zona14.png" alt="Zona 14">
+      <img id="zona15" class="zona" src="zona15.png" alt="Zona 15">
+    </div>
+  </main>
+
+  <footer>Apresentação – BSOP MILLIONS</footer>
 
   <script>
-    const ws = new WebSocket(`ws://${window.location.hostname}:8081`);
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.action === "ativar") {
-        document.querySelectorAll(".zona").forEach(z => z.classList.remove("ativa"));
-        document.getElementById(data.zona)?.classList.add("ativa");
+    // WebSocket na MESMA origem/porta do servidor (Render-friendly)
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${proto}://${location.host}`);
+
+    ws.onmessage = (ev) => {
+      const data = JSON.parse(ev.data || '{}');
+
+      // Ao entrar, aplica estado atual
+      if (data.action === 'estado_inicial' && data.zonas) {
+        Object.entries(data.zonas).forEach(([id, on]) => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle('ativa', !!on);
+        });
+        return;
       }
+
+      const el = document.getElementById(data.zona);
+      if (!el) return;
+
+      if (data.action === 'ativar') el.classList.add('ativa');
+      if (data.action === 'desativar') el.classList.remove('ativa');
     };
   </script>
 </body>
