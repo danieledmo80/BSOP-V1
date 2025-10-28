@@ -1,29 +1,36 @@
-import express from "express";
-import { WebSocketServer } from "ws";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const http = require('http');
+const WebSocket = require('ws');
+const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-app.use(express.static(path.join(__dirname, "public")));
+const PORT = process.env.PORT || 3000;
+const zonasAtivas = {};
 
-const server = app.listen(PORT, () => {
-  console.log(`🌍 Servidor rodando em http://localhost:${PORT}`);
-});
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
-const wss = new WebSocketServer({ port: 8081 });
-console.log("🔌 WebSocket ativo na porta 8081");
+// Recebe comandos do painel / Companion
+app.post('/zona', (req, res) => {
+  const { action, zona } = req.body;
+  if (!action || !zona) return res.status(400).json({ ok: false });
 
-wss.on("connection", (ws) => {
-  console.log("Cliente conectado ao WebSocket");
-  ws.on("message", (message) => {
-    console.log("Mensagem recebida:", message.toString());
-    wss.clients.forEach((client) => {
-      if (client.readyState === 1) client.send(message.toString());
-    });
+  if (action === 'ativar') zonasAtivas[zona] = true;
+  if (action === 'desativar') zonasAtivas[zona] = false;
+
+  const msg = JSON.stringify({ action, zona });
+  wss.clients.forEach((c) => {
+    if (c.readyState === WebSocket.OPEN) c.send(msg);
   });
+
+  res.json({ ok: true });
 });
+
+wss.on('connection', (ws) => {
+  ws.send(JSON.stringify({ action: 'estado_inicial', zonas: zonasAtivas }));
+});
+
+server.listen(PORT, () => console.log(`✅ Rodando na porta ${PORT}`));
