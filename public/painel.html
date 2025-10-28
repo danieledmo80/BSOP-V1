@@ -11,6 +11,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
     }
+
     header {
       display: flex;
       justify-content: space-between;
@@ -19,9 +20,15 @@
       background: linear-gradient(90deg, #0f0f0f, #252525);
       border-bottom: 2px solid #FFD700;
     }
+
     header img { height: 45px; }
     header h1 { color: #FFD700; font-size: 26px; margin: 0; }
-    main { text-align: center; padding: 20px; }
+
+    main {
+      text-align: center;
+      padding: 20px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -29,6 +36,7 @@
       max-width: 700px;
       margin: 0 auto;
     }
+
     button {
       background: #222;
       color: #fff;
@@ -39,10 +47,23 @@
       cursor: pointer;
       transition: all 0.3s;
     }
+
     button.ativo {
       background: #FFD700;
       color: #000;
       border-color: #FFD700;
+    }
+
+    .controle-geral {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .controle-geral button {
+      width: 180px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -54,12 +75,20 @@
 
   <main>
     <div class="grid" id="botoes"></div>
+
+    <div class="controle-geral">
+      <button id="todas">Selecionar todas</button>
+      <button id="resetar">Desativar todas</button>
+    </div>
   </main>
 
   <script>
     const servidor = location.origin + "/zona";
     const grid = document.getElementById("botoes");
+    const todas = document.getElementById("todas");
+    const resetar = document.getElementById("resetar");
 
+    // Cria 15 botões de zonas
     for (let i = 1; i <= 15; i++) {
       const b = document.createElement("button");
       b.id = "zona" + i;
@@ -68,11 +97,7 @@
       grid.appendChild(b);
     }
 
-    const todas = document.createElement("button");
-    todas.textContent = "Selecionar todas";
-    todas.onclick = () => toggleTodas(todas);
-    grid.appendChild(todas);
-
+    // Toggle individual
     async function toggle(btn) {
       const ativo = !btn.classList.contains("ativo");
       btn.classList.toggle("ativo", ativo);
@@ -83,9 +108,10 @@
       });
     }
 
-    async function toggleTodas(btn) {
-      const ativar = !btn.classList.contains("ativo");
-      btn.classList.toggle("ativo", ativar);
+    // Selecionar todas
+    todas.onclick = async () => {
+      const ativar = !todas.classList.contains("ativo");
+      todas.classList.toggle("ativo", ativar);
       for (const b of document.querySelectorAll(".grid button[id^='zona']")) {
         b.classList.toggle("ativo", ativar);
         await fetch(servidor, {
@@ -94,7 +120,20 @@
           body: JSON.stringify({ action: ativar ? "ativar" : "desativar", zona: b.id })
         });
       }
-    }
+    };
+
+    // Desativar todas
+    resetar.onclick = async () => {
+      todas.classList.remove("ativo");
+      for (const b of document.querySelectorAll(".grid button[id^='zona']")) {
+        b.classList.remove("ativo");
+        await fetch(servidor, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "desativar", zona: b.id })
+        });
+      }
+    };
   </script>
 </body>
 </html>
